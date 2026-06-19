@@ -1,6 +1,6 @@
-# stream_vault
+# StreamVault
 
-A new Flutter project.
+A modern Flutter IPTV streaming application featuring stream quality validation, integrated Electronic Program Guide (EPG), and advanced content caching.
 
 ## Getting Started
 
