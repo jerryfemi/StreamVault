@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:isolate';
 
 import 'package:http/http.dart' as http;
@@ -23,10 +24,16 @@ class EpgService {
       );
     }
 
-    // The EPG file from epg.pw may come pre-decompressed by the HTTP client
-    // depending on headers. We pass the raw body string to the isolate for parsing.
-    // If the endpoint returns gzipped bytes, we'd decompress first with GZipCodec.
-    final bodyString = utf8.decode(response.bodyBytes, allowMalformed: true);
+    final bytes = response.bodyBytes;
+    final String bodyString;
+
+    // Check if the response bytes are gzipped (magic bytes: 0x1F, 0x8B)
+    if (bytes.length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B) {
+      final decompressed = gzip.decode(bytes);
+      bodyString = utf8.decode(decompressed, allowMalformed: true);
+    } else {
+      bodyString = utf8.decode(bytes, allowMalformed: true);
+    }
 
     // Parse on a background isolate to avoid janking the UI thread
     return Isolate.run(() => _parseSchedule(bodyString));

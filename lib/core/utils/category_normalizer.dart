@@ -5,11 +5,12 @@ class CategoryNormalizer {
     'football': 'Sports',
     'soccer': 'Sports',
     'movie': 'Movies',
+    'movies': 'Movies',
     'films': 'Movies',
     'cinema': 'Movies',
   };
 
   static String normalize(String raw) {
-    return _map[raw.trim().toLowerCase()] ?? raw.toLowerCase();
+    return _map[raw.trim().toLowerCase()] ?? raw.trim();
   }
 }

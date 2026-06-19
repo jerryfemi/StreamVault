@@ -10,7 +10,7 @@ class M3uService {
     final response = await _client.get(
       Uri.parse(url),
       headers: {'Accept-Encoding': 'gzip'},  // iptv-org supports compression
-    ).timeout(const Duration(seconds: 15));
+    ).timeout(const Duration(seconds: 30));
 
     if (response.statusCode != 200) {
       throw NetworkException('Failed to fetch M3U: ${response.statusCode}');
