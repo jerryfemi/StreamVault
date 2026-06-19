@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StreamVault — Splash</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0A0A0C;
+            --accent: #E5383B;
+            --text-primary: #F0F0F2;
+            --text-secondary: #7A7A86;
+            --font: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .phone {
+            width: 100%;
+            max-width: 414px;
+            min-height: 100vh;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient glow effects */
+        .phone::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(229, 56, 59, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            bottom: 20%;
+            left: 30%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(99, 56, 229, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .splash-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Logo mark */
+        .logo-mark {
+            width: 80px;
+            height: 80px;
+            border-radius: 24px;
+            background: linear-gradient(145deg, var(--accent), #B91C1C);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(229, 56, 59, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .logo-mark svg {
+            width: 40px;
+            height: 40px;
+            fill: #fff;
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-top: -12px;
+        }
+
+        /* Loading spinner */
+        .loader {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(255, 255, 255, 0.06);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            animation: fade-text 2s ease-in-out infinite;
+        }
+
+        @keyframes fade-text {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Progress steps */
+        .load-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 32px;
+            width: 260px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .step-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .step-icon.done {
+            background: rgba(52, 211, 153, 0.15);
+        }
+
+        .step-icon.done svg {
+            width: 12px;
+            height: 12px;
+            fill: #34D399;
+        }
+
+        .step-icon.loading {
+            background: rgba(229, 56, 59, 0.15);
+        }
+
+        .step-icon.loading::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border: 2px solid transparent;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        .step-icon.pending {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .step-icon.pending::after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--text-secondary);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .step-text {
+            color: var(--text-secondary);
+        }
+
+        .step.done .step-text {
+            color: #34D399;
+        }
+
+        .step.active .step-text {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="phone">
+        <div class="splash-content">
+            <div class="logo-mark">
+                <svg viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+            </div>
+            <h1 class="logo-text">StreamVault</h1>
+            <p class="logo-subtitle">Live sports & movies, verified</p>
+
+            <div class="loader">
+                <div class="spinner"></div>
+                <span class="loader-text">Loading channels…</span>
+            </div>
+
+            <div class="load-steps">
+                <div class="step done">
+                    <div class="step-icon done">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                        </svg>
+                    </div>
+                    <span class="step-text">Fetching channel registry</span>
+                </div>
+                <div class="step done">
+                    <div class="step-icon done">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                        </svg>
+                    </div>
+                    <span class="step-text">Cross-referencing verified IDs</span>
+                </div>
+                <div class="step active">
+                    <div class="step-icon loading"></div>
+                    <span class="step-text">Loading EPG data…</span>
+                </div>
+                <div class="step">
+                    <div class="step-icon pending"></div>
+                    <span class="step-text">Validating streams</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
