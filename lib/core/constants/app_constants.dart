@@ -9,7 +9,7 @@ class AppConstants {
       'https://iptv-org.github.io/iptv/categories/movies.m3u';
 
   // ── EPG ──
-  static const String epgUrl = 'https://i.mjh.nz/PlutoTV/us.xml.gz';
+  static const String epgUrl = 'https://jerryfemi.github.io/StreamVault-epg/guide.xml.gz';
 
   // ── Cache TTLs ──
   static const Duration channelCacheTtl = Duration(hours: 6);
