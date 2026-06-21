@@ -10,6 +10,7 @@ import '../data/repositories/epg_repository.dart';
 import '../data/services/epg_service.dart';
 import '../data/services/m3u_service.dart';
 import '../data/services/registry_service.dart';
+import 'favorites_notifier.dart';
 import 'stream_status_notifier.dart';
 
 // ═══════════════════════════════════════════════════════════════════
@@ -86,6 +87,11 @@ final streamStatusProvider =
   (ref) => StreamStatusNotifier(),
 );
 
+/// Favorites provider for managing favorite channels.
+final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<String>>(
+  (ref) => FavoritesNotifier(),
+);
+
 // ═══════════════════════════════════════════════════════════════════
 // UI-FACING PROVIDERS (derived, cheap)
 // ═══════════════════════════════════════════════════════════════════
@@ -101,9 +107,12 @@ final filteredChannelsProvider = Provider<AsyncValue<List<Channel>>>((ref) {
   final channels = ref.watch(allChannelsProvider);
   final category = ref.watch(activeCategoryProvider);
   final query = ref.watch(searchQueryProvider);
+  final favorites = ref.watch(favoritesProvider);
 
   return channels.whenData((list) => list.where((c) {
-        final matchesCategory = c.category == category;
+        final matchesCategory = category == 'Favorites'
+            ? favorites.contains(c.id)
+            : c.category == category;
         final matchesSearch = query.isEmpty ||
             c.name.toLowerCase().contains(query.toLowerCase());
         return matchesCategory && matchesSearch;
