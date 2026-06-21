@@ -7,6 +7,7 @@ class CacheManager {
   Future<void> init() async {
     Hive.registerAdapter(ChannelAdapter());
     await Hive.openBox<Channel>(_boxName);
+    await Hive.openBox<String>('favorites_cache');
   }
 
   Future<List<Channel>?> getChannels() async {

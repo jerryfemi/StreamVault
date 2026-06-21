@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'data/repositories/cache_manager.dart';
 
@@ -12,7 +13,11 @@ void main() async {
   final cacheManager = CacheManager();
   await cacheManager.init();
 
-  runApp(StreamVaultApp());
+  runApp(
+    const ProviderScope(
+      child: StreamVaultApp(),
+    ),
+  );
 }
 
 class StreamVaultApp extends StatelessWidget {

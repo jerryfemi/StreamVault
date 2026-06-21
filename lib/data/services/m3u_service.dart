@@ -7,10 +7,12 @@ class M3uService {
   M3uService({http.Client? client}) : _client = client ?? http.Client();
 
   Future<List<RawM3uEntry>> fetchCategory(String url) async {
-    final response = await _client.get(
-      Uri.parse(url),
-      headers: {'Accept-Encoding': 'gzip'},  // iptv-org supports compression
-    ).timeout(const Duration(seconds: 30));
+    final response = await _client
+        .get(
+          Uri.parse(url),
+          headers: {'Accept-Encoding': 'gzip'}, // iptv-org supports compression
+        )
+        .timeout(const Duration(seconds: 30));
 
     if (response.statusCode != 200) {
       throw NetworkException('Failed to fetch M3U: ${response.statusCode}');
@@ -30,11 +32,13 @@ class M3uService {
       final streamUrl = lines[i + 1].trim();
       if (streamUrl.isEmpty || streamUrl.startsWith('#')) continue;
 
-      entries.add(RawM3uEntry(
-        attributes: _parseAttributes(line),
-        title: _parseTitle(line),
-        streamUrl: streamUrl,
-      ));
+      entries.add(
+        RawM3uEntry(
+          attributes: _parseAttributes(line),
+          title: _parseTitle(line),
+          streamUrl: streamUrl,
+        ),
+      );
     }
     return entries;
   }

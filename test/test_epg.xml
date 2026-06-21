@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tv generator-info-name="MockEPG">
+  <channel id="FoxSports1.us@HD">
+    <display-name>Fox Sports 1</display-name>
+  </channel>
+  <programme start="20260620000000 +0000" stop="20260621235900 +0000" channel="FoxSports1.us@HD">
+    <title lang="en">LIVE: USA vs Mexico (World Cup Qualifier)</title>
+    <desc lang="en">Live coverage of the CONCACAF World Cup Qualifier match.</desc>
+  </programme>
+  
+  <channel id="beINSportsUSA.us@SD">
+    <display-name>beIN Sports USA</display-name>
+  </channel>
+  <programme start="20260620000000 +0000" stop="20260621235900 +0000" channel="beINSportsUSA.us@SD">
+    <title lang="en">LIVE: Real Madrid vs Barcelona (El Clasico)</title>
+    <desc lang="en">Live coverage from Santiago Bernabeu.</desc>
+  </programme>
+
+  <channel id="Africa24Sport.fr@SD">
+    <display-name>Africa 24 Sport</display-name>
+  </channel>
+  <programme start="20260620000000 +0000" stop="20260621235900 +0000" channel="Africa24Sport.fr@SD">
+    <title lang="en">AFCON Highlights</title>
+    <desc lang="en">Best goals from the Africa Cup of Nations.</desc>
+  </programme>
+</tv>

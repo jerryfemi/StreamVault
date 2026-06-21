@@ -14,25 +14,37 @@ import '../models/epg_programme.dart';
 /// to prevent frame drops on the main UI thread (EPG files are typically 10-50MB).
 class EpgService {
   Future<Map<String, List<EpgProgramme>>> fetchSchedule() async {
-    final response = await http.get(
-      Uri.parse(AppConstants.epgUrl),
-    ).timeout(const Duration(seconds: 60));
-
-    if (response.statusCode != 200) {
-      throw NetworkException(
-        'Failed to fetch EPG data: ${response.statusCode}',
-      );
-    }
-
-    final bytes = response.bodyBytes;
     final String bodyString;
-
-    // Check if the response bytes are gzipped (magic bytes: 0x1F, 0x8B)
-    if (bytes.length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B) {
-      final decompressed = gzip.decode(bytes);
-      bodyString = utf8.decode(decompressed, allowMalformed: true);
+    
+    if (AppConstants.epgUrl.startsWith('file://')) {
+      // Local testing override
+      final file = File(Uri.parse(AppConstants.epgUrl).toFilePath());
+      bodyString = await file.readAsString();
     } else {
-      bodyString = utf8.decode(bytes, allowMalformed: true);
+      final response = await http.get(
+        Uri.parse(AppConstants.epgUrl),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+          'Accept-Encoding': 'gzip, deflate, br',
+        }
+      ).timeout(const Duration(seconds: 120));
+
+      if (response.statusCode != 200) {
+        throw NetworkException(
+          'Failed to fetch EPG data: ${response.statusCode}',
+        );
+      }
+
+      final bytes = response.bodyBytes;
+
+      // Check if the response bytes are gzipped (magic bytes: 0x1F, 0x8B)
+      if (bytes.length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B) {
+        final decompressed = gzip.decode(bytes);
+        bodyString = utf8.decode(decompressed, allowMalformed: true);
+      } else {
+        bodyString = utf8.decode(bytes, allowMalformed: true);
+      }
     }
 
     // Parse on a background isolate to avoid janking the UI thread
