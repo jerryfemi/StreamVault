@@ -43,7 +43,7 @@ class ChannelRepository {
           (c) =>
               c.streamUrl.isNotEmpty &&
               c.tvgId.isNotEmpty &&
-              verifiedIds.contains(c.tvgId),
+              verifiedIds.contains(c.tvgId.split('@').first),
         ) // THE QUALITY GATE
         .toList();
 

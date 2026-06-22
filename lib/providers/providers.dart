@@ -62,30 +62,64 @@ final allChannelsProvider = FutureProvider<List<Channel>>((ref) async {
   ]);
 });
 
-/// EPG schedule — refreshes every hour, holds a 24h forward window per channel.
-final epgScheduleProvider = FutureProvider<void>((ref) async {
-  await ref.watch(epgRepoProvider).refresh();
+/// EPG schedule map — the actual parsed data, reactive.
+/// When this completes, all nowPlayingProvider/upNextProvider watchers rebuild.
+final epgScheduleProvider = FutureProvider<Map<String, List<EpgProgramme>>>((
+  ref,
+) async {
+  final service = ref.watch(epgServiceProvider);
+  return service.fetchSchedule();
 });
 
 /// Current programme for a given channel — what's playing right now.
-final nowPlayingProvider =
-    Provider.family<EpgProgramme?, String>((ref, channelId) {
-  ref.watch(epgScheduleProvider);
-  return ref.watch(epgRepoProvider).getCurrent(channelId);
+final nowPlayingProvider = Provider.family<EpgProgramme?, String>((
+  ref,
+  channelId,
+) {
+  final scheduleAsync = ref.watch(epgScheduleProvider);
+  return scheduleAsync.whenOrNull(
+    data: (schedule) {
+      final list = schedule[channelId];
+      if (list == null) return null;
+      for (final p in list) {
+        if (p.isLive) return p;
+      }
+      return null;
+    },
+  );
 });
 
 /// Next programme for a given channel — powers the "Up Next" section in the player.
-final upNextProvider =
-    Provider.family<EpgProgramme?, String>((ref, channelId) {
-  ref.watch(epgScheduleProvider);
-  return ref.watch(epgRepoProvider).getNext(channelId);
+final upNextProvider = Provider.family<EpgProgramme?, String>((ref, channelId) {
+  final scheduleAsync = ref.watch(epgScheduleProvider);
+  return scheduleAsync.whenOrNull(
+    data: (schedule) {
+      final list = schedule[channelId];
+      if (list == null) return null;
+      EpgProgramme? current;
+      for (final p in list) {
+        if (p.isLive) {
+          current = p;
+          break;
+        }
+      }
+      if (current == null) return list.firstOrNull;
+      for (final p in list) {
+        if (p.start.isAfter(current.end) ||
+            p.start.isAtSameMomentAs(current.end)) {
+          return p;
+        }
+      }
+      return null;
+    },
+  );
 });
 
 /// Stream validation status map — updates progressively as cards become visible.
 final streamStatusProvider =
     StateNotifierProvider<StreamStatusNotifier, Map<String, StreamStatus>>(
-  (ref) => StreamStatusNotifier(),
-);
+      (ref) => StreamStatusNotifier(),
+    );
 
 /// Favorites provider for managing favorite channels.
 final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<String>>(
@@ -109,12 +143,14 @@ final filteredChannelsProvider = Provider<AsyncValue<List<Channel>>>((ref) {
   final query = ref.watch(searchQueryProvider);
   final favorites = ref.watch(favoritesProvider);
 
-  return channels.whenData((list) => list.where((c) {
-        final matchesCategory = category == 'Favorites'
-            ? favorites.contains(c.id)
-            : c.category == category;
-        final matchesSearch = query.isEmpty ||
-            c.name.toLowerCase().contains(query.toLowerCase());
-        return matchesCategory && matchesSearch;
-      }).toList());
+  return channels.whenData(
+    (list) => list.where((c) {
+      final matchesCategory = category == 'Favorites'
+          ? favorites.contains(c.id)
+          : c.category == category;
+      final matchesSearch =
+          query.isEmpty || c.name.toLowerCase().contains(query.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList(),
+  );
 });
