@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stream_vault/ui/shell/app_shell.dart';
 import 'package:stream_vault/ui/pages/browse_page.dart';
+import 'package:stream_vault/ui/pages/player_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -30,6 +31,15 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/browse',
                 builder: (context, state) => const BrowsePage(),
+                routes: [
+                  GoRoute(
+                    path: 'player/:channelId',
+                    builder: (context, state) {
+                      final channelId = Uri.decodeComponent(state.pathParameters['channelId']!);
+                      return PlayerPage(channelId: channelId);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

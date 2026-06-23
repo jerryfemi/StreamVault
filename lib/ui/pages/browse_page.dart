@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
 import '../widgets/channel_card.dart';
@@ -97,23 +98,22 @@ class BrowsePage extends ConsumerWidget {
                   crossAxisSpacing: 12,
                   childAspectRatio: 0.78,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final channel = channels[index];
-                    return ChannelCard(
-                      channel: channel,
-                      onTap: () {
-                        // TODO: Navigate to player
-                      },
-                      onLongPress: () {
-                        ref
-                            .read(favoritesProvider.notifier)
-                            .toggleFavorite(channel.id);
-                      },
-                    );
-                  },
-                  childCount: channels.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final channel = channels[index];
+                  return ChannelCard(
+                    channel: channel,
+                    onTap: () {
+                      context.push(
+                        '/browse/player/${Uri.encodeComponent(channel.id)}',
+                      );
+                    },
+                    onLongPress: () {
+                      ref
+                          .read(favoritesProvider.notifier)
+                          .toggleFavorite(channel.id);
+                    },
+                  );
+                }, childCount: channels.length),
               ),
             ),
             loading: () => const SliverFillRemaining(
@@ -121,15 +121,18 @@ class BrowsePage extends ConsumerWidget {
                 child: CircularProgressIndicator(color: AppColors.accent),
               ),
             ),
-            error: (e, _) => SliverFillRemaining(
-              child: Center(
-                child: Text(
-                  'Failed to load channels\n$e',
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.subtitle,
+            error: (e, _) {
+              print(e);
+              return SliverFillRemaining(
+                child: Center(
+                  child: Text(
+                    'Failed to load channels\n$e',
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.subtitle,
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
 
           // Bottom padding for nav bar

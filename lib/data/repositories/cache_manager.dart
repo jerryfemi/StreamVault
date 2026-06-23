@@ -8,8 +8,6 @@ class CacheManager {
     Hive.registerAdapter(ChannelAdapter());
     await Hive.openBox<Channel>(_boxName);
     await Hive.openBox<String>('favorites_cache');
-    // Clear stale cache from previous runs with broken quality gate
-    await clearCache();
   }
 
   Future<void> clearCache() async {
@@ -25,7 +23,7 @@ class CacheManager {
 
   Future<void> saveChannels(List<Channel> channels) async {
     final box = Hive.box<Channel>(_boxName);
-    await box.clear(); // Clear old cache
+    await box.clear();
     await box.addAll(channels);
   }
 }

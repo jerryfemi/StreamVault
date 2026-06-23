@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -14,59 +15,60 @@ import '../models/epg_programme.dart';
 /// rather than dart:io's gzip codec (which is unavailable on web).
 class EpgService {
   Future<Map<String, List<EpgProgramme>>> fetchSchedule() async {
-    final response = await http.get(
-      Uri.parse(AppConstants.epgUrl),
-      headers: {
-        'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': 'application/xml, text/xml, */*',
-        // Don't request gzip on web — let the browser handle it transparently.
-        // On web, the browser decompresses gzip automatically.
-      },
-    ).timeout(const Duration(seconds: 120));
+    try {
+      debugPrint('EpgService: Fetching EPG from ${AppConstants.epgUrl}...');
+      final response = await http.get(
+        Uri.parse(AppConstants.epgUrl),
+        headers: {
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'application/xml, text/xml, */*',
+        },
+      ).timeout(const Duration(seconds: 120));
 
-    if (response.statusCode != 200) {
-      throw NetworkException(
-        'Failed to fetch EPG data: ${response.statusCode}',
-      );
+      debugPrint('EpgService: Response status code: ${response.statusCode}');
+      if (response.statusCode != 200) {
+        throw NetworkException(
+          'Failed to fetch EPG data: ${response.statusCode}',
+        );
+      }
+
+      String bodyString;
+      final bytes = response.bodyBytes;
+      debugPrint('EpgService: Received ${bytes.length} bytes');
+
+      if (bytes.length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B) {
+        debugPrint('EpgService: Bytes have gzip magic header. Trying to decode...');
+        bodyString = await _decompressGzip(bytes);
+      } else {
+        debugPrint('EpgService: Bytes do not have gzip magic header. Decoding as UTF8...');
+        bodyString = utf8.decode(bytes, allowMalformed: true);
+      }
+      
+      debugPrint('EpgService: XML string length: ${bodyString.length}');
+
+      debugPrint('EpgService: First 100 chars: ${bodyString.substring(0, bodyString.length < 100 ? bodyString.length : 100)}');
+
+      debugPrint('EpgService: Using compute to parse XML in background isolate...');
+      final schedule = await compute(_parseSchedule, bodyString);
+
+      debugPrint(
+          'EpgService: Successfully parsed schedule for ${schedule.keys.length} channels.');
+      return schedule;
+    } catch (e, stack) {
+      debugPrint('EpgService: Error during EPG fetch/parse: $e\n$stack');
+      debugPrint('EpgService: Continuing with empty schedule.');
+      return {};
     }
-
-    String bodyString;
-    final bytes = response.bodyBytes;
-
-    // Check if the response bytes are gzipped (magic bytes: 0x1F, 0x8B).
-    // On web, the browser typically decompresses gzip transparently,
-    // so we may get raw XML directly. On native, we may get raw gzip bytes.
-    if (bytes.length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B) {
-      // Gzipped — decompress using dart:io on native only.
-      // On web this branch should not be hit because the browser decompresses.
-      bodyString = await _decompressGzip(bytes);
-    } else {
-      bodyString = utf8.decode(bytes, allowMalformed: true);
-    }
-
-    // Parse on a background isolate (compute works on both web and native)
-    return compute(_parseSchedule, bodyString);
   }
 
   /// Decompresses gzip bytes. Uses dart:io on native platforms.
-  /// On web, the browser should handle decompression transparently,
-  /// but as a fallback we try ZLibDecoder from dart:convert (not available
-  /// on web), so this is only called on native.
   Future<String> _decompressGzip(List<int> bytes) async {
-    // Dynamic import workaround — this code only runs on native
-    // where dart:io is available.
     try {
-      // Use the zlib codec from dart:convert which is platform-agnostic
-      // ZLibDecoder is in dart:io though, so we use a different approach:
-      // The gzip format starts with a header, then deflate data.
-      // dart:convert has no built-in gzip decoder, so for native we
-      // use compute to call the parser with the raw approach.
-      
-      // Actually, on native platforms, the http package may or may not
-      // auto-decompress. Let's just try to parse as UTF-8 first.
-      return utf8.decode(bytes, allowMalformed: true);
-    } catch (_) {
+      final decodedBytes = gzip.decode(bytes);
+      return utf8.decode(decodedBytes, allowMalformed: true);
+    } catch (e) {
+      debugPrint('EpgService: Failed to decompress gzip: $e');
       return utf8.decode(bytes, allowMalformed: true);
     }
   }

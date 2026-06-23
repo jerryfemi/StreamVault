@@ -5,8 +5,11 @@ import 'core/theme/app_theme.dart';
 import 'core/navigation/router.dart';
 import 'data/repositories/cache_manager.dart';
 
+import 'package:media_kit/media_kit.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
 
   // Initialize Hive CE
   await Hive.initFlutter();
