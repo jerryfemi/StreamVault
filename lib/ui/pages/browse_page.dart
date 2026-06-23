@@ -44,9 +44,9 @@ class BrowsePage extends ConsumerWidget {
           ),
 
           // ── Category Tabs ──
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _CategoryTabsDelegate(
               child: _CategoryTabs(
                 activeCategory: activeCategory,
                 allChannels: allChannels,
@@ -230,5 +230,36 @@ class _CategoryTabs extends ConsumerWidget {
         }).toList(),
       ),
     );
+  }
+}
+
+class _CategoryTabsDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _CategoryTabsDelegate({required this.child});
+
+  @override
+  double get minExtent => 68.0;
+
+  @override
+  double get maxExtent => 68.0;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: AppColors.bg,
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      alignment: Alignment.center,
+      child: child,
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant _CategoryTabsDelegate oldDelegate) {
+    return true;
   }
 }
