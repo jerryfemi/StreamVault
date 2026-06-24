@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../providers/providers.dart';
-import '../../../data/models/channel.dart';
 
 class AlsoShowingSection extends ConsumerWidget {
   final String currentTitle;
@@ -17,19 +16,10 @@ class AlsoShowingSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final allChannelsAsync = ref.watch(allChannelsProvider);
-    return allChannelsAsync.when(
-      data: (allChannels) {
-        // Find channels playing the same exact title right now
-        final matches = <Channel>[];
-        for (final ch in allChannels) {
-          if (ch.id == currentId) continue;
-          final prog = ref.read(nowPlayingProvider(ch.id));
-          if (prog != null && prog.title == currentTitle) {
-            matches.add(ch);
-          }
-        }
+    final matchesAsync = ref.watch(alsoShowingProvider(currentId));
 
+    return matchesAsync.when(
+      data: (matches) {
         if (matches.isEmpty) return const SizedBox.shrink();
 
         return Padding(

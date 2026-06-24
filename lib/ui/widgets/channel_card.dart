@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/country_helper.dart';
 import '../../data/models/channel.dart';
 import '../../data/models/epg_programme.dart';
 import '../../data/models/stream_status.dart';
@@ -27,17 +29,27 @@ class ChannelCard extends ConsumerWidget {
     final status =
         ref.watch(streamStatusProvider)[channel.id] ?? StreamStatus.unknown;
     final nowPlaying = ref.watch(nowPlayingProvider(channel.tvgId));
-    final isFav = ref.watch(favoritesProvider).contains(channel.id);
     final isDead = status == StreamStatus.dead;
 
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: AnimatedOpacity(
-        opacity: isDead ? 0.35 : 1.0,
-        duration: const Duration(milliseconds: 250),
-        child: Container(
-          padding: const EdgeInsets.all(16),
+    return VisibilityDetector(
+      key: Key('channel_card_${channel.id}'),
+      onVisibilityChanged: (info) {
+        if (info.visibleFraction > 0.1) {
+          ref.read(streamStatusProvider.notifier).validateIfUnknown(
+                channel.id,
+                channel.streamUrl,
+                channel.headers,
+              );
+        }
+      },
+      child: GestureDetector(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: AnimatedOpacity(
+          opacity: isDead ? 0.35 : 1.0,
+          duration: const Duration(milliseconds: 250),
+          child: Container(
+            padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: AppColors.surface,
             border: Border.all(color: AppColors.border),
@@ -47,18 +59,40 @@ class ChannelCard extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Top row: Logo + status dot ──
-              _buildTopRow(status, isFav, ref),
-              const SizedBox(height: 10),
-
-              // ── Channel name ──
-              Text(
-                channel.name,
-                style: AppTextStyles.channelName,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              // ── Top row: Logo, Name, Flag ──
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _ChannelLogo(channel: channel),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      channel.name,
+                      style: AppTextStyles.channelName.copyWith(fontSize: 14),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _StatusDot(status: status),
+                      const SizedBox(height: 4),
+                      if (CountryHelper.getCountryCode(channel.id) != null)
+                        Text(
+                          '${CountryHelper.getFlag(channel.id)} ${CountryHelper.getCountryCode(channel.id)!.toUpperCase() == 'UK' ? 'GB' : CountryHelper.getCountryCode(channel.id)!.toUpperCase()}',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textTertiary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 12),
 
               // ── Bottom section: EPG or fallback ──
               if (isDead)
@@ -71,27 +105,7 @@ class ChannelCard extends ConsumerWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTopRow(StreamStatus status, bool isFav, WidgetRef ref) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Channel logo
-        _ChannelLogo(channel: channel),
-        // Status dot + favorite
-        Column(
-          children: [
-            _StatusDot(status: status),
-            if (isFav) ...[
-              const SizedBox(height: 4),
-              const Icon(Icons.favorite, color: AppColors.accent, size: 12),
-            ],
-          ],
-        ),
-      ],
+      ),
     );
   }
 
@@ -112,11 +126,26 @@ class ChannelCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Title row with pulsing dot
+          // Title row with LIVE badge
           Row(
             children: [
-              const _PulsingDot(),
-              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.accent, // Red color
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'LIVE',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   programme.title,

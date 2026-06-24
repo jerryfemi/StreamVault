@@ -65,10 +65,13 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
       if (mounted) setState(() => _isBuffering = buffering);
     });
     _player.stream.error.listen((error) {
-      if (mounted) {
+      debugPrint('Player error: $error');
+      // Only show the fatal error overlay if the player is completely stopped
+      // and not trying to recover/buffer. MPV often throws non-fatal warnings
+      // for dropped HLS chunks while the video continues to play!
+      if (mounted && !_player.state.playing && !_isBuffering) {
         setState(() {
           _hasError = true;
-          _isBuffering = false;
         });
       }
     });
