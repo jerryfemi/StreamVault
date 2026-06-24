@@ -34,10 +34,10 @@ jobs:
           mkdir -p build/ios/ipa/Payload
           cp -r build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/ios/ipa/Payload/
           cd build/ios/ipa
-          zip -r stream_vault.ipa Payload
+          zip -r StreamVault.ipa Payload
           
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-app
-          path: build/ios/ipa/stream_vault.ipa
+          path: build/ios/ipa/StreamVault.ipa
