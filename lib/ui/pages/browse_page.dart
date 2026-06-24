@@ -78,6 +78,33 @@ class BrowsePage extends ConsumerWidget {
                         ],
                       ),
                     ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceElevated,
+                        borderRadius: BorderRadius.circular(AppRadii.button),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.sort,
+                            color: AppColors.textSecondary,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Live first',
+                            style: AppTextStyles.channelName.copyWith(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 loading: () => const SizedBox.shrink(),
@@ -176,13 +203,18 @@ class _SearchBar extends ConsumerWidget {
               ),
             ),
           ),
+          const Icon(
+            Icons.filter_list,
+            color: AppColors.textTertiary,
+            size: 18,
+          ),
         ],
       ),
     );
   }
 }
 
-/// Category tab bar — All | Sports | Movies | Favorites
+/// Category tab bar — All | Sports | Movies
 class _CategoryTabs extends ConsumerWidget {
   final String activeCategory;
   final AsyncValue allChannels;
@@ -194,7 +226,16 @@ class _CategoryTabs extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final categories = ['Sports', 'Movies', 'Favorites'];
+    final channels = allChannels.valueOrNull ?? [];
+    final allCount = channels.length;
+    final sportsCount = channels.where((c) => c.category == 'Sports').length;
+    final moviesCount = channels.where((c) => c.category == 'Movies').length;
+
+    final categories = [
+      {'name': 'All', 'count': allCount},
+      {'name': 'Sports', 'count': sportsCount},
+      {'name': 'Movies', 'count': moviesCount},
+    ];
 
     return Container(
       padding: const EdgeInsets.all(4),
@@ -204,12 +245,15 @@ class _CategoryTabs extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppRadii.tabContainer),
       ),
       child: Row(
-        children: categories.map((cat) {
-          final isActive = activeCategory == cat;
+        children: categories.map((catData) {
+          final catName = catData['name'] as String;
+          final catCount = catData['count'] as int;
+          final isActive = activeCategory == catName;
+
           return Expanded(
             child: GestureDetector(
               onTap: () =>
-                  ref.read(activeCategoryProvider.notifier).state = cat,
+                  ref.read(activeCategoryProvider.notifier).state = catName,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -218,10 +262,29 @@ class _CategoryTabs extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(AppRadii.tab),
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  cat,
-                  style: AppTextStyles.tabText.copyWith(
-                    color: isActive ? AppColors.bg : AppColors.textSecondary,
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: catName,
+                        style: AppTextStyles.tabText.copyWith(
+                          color: isActive
+                              ? AppColors.bg
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                      if (catCount > 0)
+                        TextSpan(
+                          text: '  $catCount',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: isActive
+                                ? AppColors.bg.withValues(alpha: 0.5)
+                                : AppColors.textTertiary,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

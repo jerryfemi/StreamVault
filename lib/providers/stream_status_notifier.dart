@@ -23,7 +23,7 @@ class StreamStatusNotifier extends StateNotifier<Map<String, StreamStatus>> {
     // Mark as checking
     state = {...state, channelId: StreamStatus.checking};
 
-    // Perform the HEAD request with per-channel headers
+    // Perform the GET request with per-channel headers
     final result = await StreamValidator.check(streamUrl, headers);
 
     // Update with the result
