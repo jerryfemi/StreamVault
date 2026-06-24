@@ -27,14 +27,17 @@ jobs:
           pod install
 
       - name: Build archive
-        run: flutter build ipa --release --no-codesign --archive=build/ios/archive/Runner.xcarchive
+        run: flutter build ipa --release --no-codesign
         
-      - name: Create IPA
+      - name: Package Unsigned IPA
         run: |
-          xcodebuild -exportArchive -archivePath build/ios/archive/Runner.xcarchive -exportPath build/ios/ipa -exportOptionsPlist ios/ExportOptions.plist
+          mkdir -p build/ios/ipa/Payload
+          cp -r build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app build/ios/ipa/Payload/
+          cd build/ios/ipa
+          zip -r stream_vault.ipa Payload
           
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-app
-          path: build/ios/ipa/*.ipa
+          path: build/ios/ipa/stream_vault.ipa
