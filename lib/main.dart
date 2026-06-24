@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
+import 'core/theme/app_theme.dart';
+import 'core/navigation/router.dart';
 import 'data/repositories/cache_manager.dart';
+
+import 'package:media_kit/media_kit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
 
   // Initialize Hive CE
   await Hive.initFlutter();
@@ -13,40 +18,21 @@ void main() async {
   final cacheManager = CacheManager();
   await cacheManager.init();
 
-  runApp(
-    const ProviderScope(
-      child: StreamVaultApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: StreamVaultApp()));
 }
 
-class StreamVaultApp extends StatelessWidget {
+class StreamVaultApp extends ConsumerWidget {
   const StreamVaultApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
       title: 'StreamVault',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
-      home: const DashboardScreen(),
-    );
-  }
-}
-
-class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('StreamVault')),
-      body: const Center(child: Text('Dashboard Placeholder')),
+      debugShowCheckedModeBanner: false,
+      theme: buildAppTheme(),
+      routerConfig: router,
     );
   }
 }

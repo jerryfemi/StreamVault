@@ -62,30 +62,64 @@ final allChannelsProvider = FutureProvider<List<Channel>>((ref) async {
   ]);
 });
 
-/// EPG schedule — refreshes every hour, holds a 24h forward window per channel.
-final epgScheduleProvider = FutureProvider<void>((ref) async {
-  await ref.watch(epgRepoProvider).refresh();
+/// EPG schedule map — the actual parsed data, reactive.
+/// When this completes, all nowPlayingProvider/upNextProvider watchers rebuild.
+final epgScheduleProvider = FutureProvider<Map<String, List<EpgProgramme>>>((
+  ref,
+) async {
+  final service = ref.watch(epgServiceProvider);
+  return service.fetchSchedule();
 });
 
 /// Current programme for a given channel — what's playing right now.
-final nowPlayingProvider =
-    Provider.family<EpgProgramme?, String>((ref, channelId) {
-  ref.watch(epgScheduleProvider);
-  return ref.watch(epgRepoProvider).getCurrent(channelId);
+final nowPlayingProvider = Provider.family<EpgProgramme?, String>((
+  ref,
+  channelId,
+) {
+  final scheduleAsync = ref.watch(epgScheduleProvider);
+  return scheduleAsync.whenOrNull(
+    data: (schedule) {
+      final list = schedule[channelId];
+      if (list == null) return null;
+      for (final p in list) {
+        if (p.isLive) return p;
+      }
+      return null;
+    },
+  );
 });
 
 /// Next programme for a given channel — powers the "Up Next" section in the player.
-final upNextProvider =
-    Provider.family<EpgProgramme?, String>((ref, channelId) {
-  ref.watch(epgScheduleProvider);
-  return ref.watch(epgRepoProvider).getNext(channelId);
+final upNextProvider = Provider.family<EpgProgramme?, String>((ref, channelId) {
+  final scheduleAsync = ref.watch(epgScheduleProvider);
+  return scheduleAsync.whenOrNull(
+    data: (schedule) {
+      final list = schedule[channelId];
+      if (list == null) return null;
+      EpgProgramme? current;
+      for (final p in list) {
+        if (p.isLive) {
+          current = p;
+          break;
+        }
+      }
+      if (current == null) return list.firstOrNull;
+      for (final p in list) {
+        if (p.start.isAfter(current.end) ||
+            p.start.isAtSameMomentAs(current.end)) {
+          return p;
+        }
+      }
+      return null;
+    },
+  );
 });
 
 /// Stream validation status map — updates progressively as cards become visible.
 final streamStatusProvider =
     StateNotifierProvider<StreamStatusNotifier, Map<String, StreamStatus>>(
-  (ref) => StreamStatusNotifier(),
-);
+      (ref) => StreamStatusNotifier(),
+    );
 
 /// Favorites provider for managing favorite channels.
 final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<String>>(
@@ -97,7 +131,7 @@ final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<String>>(
 // ═══════════════════════════════════════════════════════════════════
 
 /// Active category filter.
-final activeCategoryProvider = StateProvider<String>((ref) => 'Sports');
+final activeCategoryProvider = StateProvider<String>((ref) => 'All');
 
 /// Search query.
 final searchQueryProvider = StateProvider<String>((ref) => '');
@@ -109,12 +143,97 @@ final filteredChannelsProvider = Provider<AsyncValue<List<Channel>>>((ref) {
   final query = ref.watch(searchQueryProvider);
   final favorites = ref.watch(favoritesProvider);
 
-  return channels.whenData((list) => list.where((c) {
-        final matchesCategory = category == 'Favorites'
-            ? favorites.contains(c.id)
-            : c.category == category;
-        final matchesSearch = query.isEmpty ||
-            c.name.toLowerCase().contains(query.toLowerCase());
-        return matchesCategory && matchesSearch;
-      }).toList());
+  return channels.whenData((list) {
+    final filtered = list.where((c) {
+      final matchesCategory = category == 'All' || c.category == category;
+      final matchesSearch =
+          query.isEmpty || c.name.toLowerCase().contains(query.toLowerCase());
+      return matchesCategory && matchesSearch;
+    }).toList();
+
+    filtered.sort((a, b) {
+      final aFav = favorites.contains(a.id);
+      final bFav = favorites.contains(b.id);
+      if (aFav && !bFav) return -1;
+      if (!aFav && bFav) return 1;
+      return a.name.compareTo(b.name);
+    });
+
+    return filtered;
+  });
+});
+
+/// A provider to get the saved channels, split into live and offline.
+final savedChannelsProvider = Provider<AsyncValue<Map<String, List<Channel>>>>((
+  ref,
+) {
+  final channelsAsync = ref.watch(allChannelsProvider);
+  final favorites = ref.watch(favoritesProvider);
+  final scheduleAsync = ref.watch(epgScheduleProvider);
+
+  return channelsAsync.whenData((channels) {
+    final savedChannels = channels
+        .where((c) => favorites.contains(c.id))
+        .toList();
+    final live = <Channel>[];
+    final offline = <Channel>[];
+
+    final schedule = scheduleAsync.valueOrNull ?? {};
+
+    for (final channel in savedChannels) {
+      final list = schedule[channel.tvgId];
+      bool isLive = false;
+      if (list != null) {
+        for (final p in list) {
+          if (p.isLive) {
+            isLive = true;
+            break;
+          }
+        }
+      }
+      if (isLive) {
+        live.add(channel);
+      } else {
+        offline.add(channel);
+      }
+    }
+
+    return {'live': live, 'offline': offline};
+  });
+});
+
+/// A provider to find other channels currently playing the same program as the given channel.
+final alsoShowingProvider = Provider.family<AsyncValue<List<Channel>>, String>((
+  ref,
+  channelId,
+) {
+  final channelsAsync = ref.watch(allChannelsProvider);
+  final scheduleAsync = ref.watch(epgScheduleProvider);
+  final nowPlaying = ref.watch(nowPlayingProvider(channelId));
+
+  if (nowPlaying == null) {
+    return const AsyncValue.data([]);
+  }
+
+  return channelsAsync.whenData((channels) {
+    final schedule = scheduleAsync.valueOrNull ?? {};
+    final matchingChannels = <Channel>[];
+
+    for (final channel in channels) {
+      if (channel.id == channelId) continue; // Skip current channel
+
+      final list = schedule[channel.tvgId];
+      if (list != null) {
+        for (final p in list) {
+          if (p.isLive &&
+              p.title.toLowerCase() == nowPlaying.title.toLowerCase()) {
+            matchingChannels.add(channel);
+            break;
+          }
+        }
+      }
+    }
+
+    return matchingChannels;
+  });
 });

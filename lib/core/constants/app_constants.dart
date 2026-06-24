@@ -17,7 +17,7 @@ class AppConstants {
   static const Duration epgRefreshInterval = Duration(hours: 1);
 
   // ── Network timeouts ──
-  static const Duration defaultTimeout = Duration(seconds: 15);
-  static const Duration registryTimeout = Duration(seconds: 20);
-  static const Duration validationTimeout = Duration(seconds: 7);
+  static const Duration defaultTimeout = Duration(seconds: 60);
+  static const Duration registryTimeout = Duration(seconds: 60);
+  static const Duration validationTimeout = Duration(seconds: 30);
 }

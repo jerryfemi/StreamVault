@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:isolate';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:xml/xml.dart';
 import '../../core/constants/app_constants.dart';
@@ -10,45 +10,67 @@ import '../models/epg_programme.dart';
 
 /// Fetches and parses compressed XMLTV EPG data.
 ///
-/// The heavy XML parsing runs on a background isolate via [Isolate.run]
-/// to prevent frame drops on the main UI thread (EPG files are typically 10-50MB).
+/// Uses [compute] instead of [Isolate.run] for web compatibility.
+/// Handles gzip decompression via the http library's built-in support
+/// rather than dart:io's gzip codec (which is unavailable on web).
 class EpgService {
   Future<Map<String, List<EpgProgramme>>> fetchSchedule() async {
-    final String bodyString;
-    
-    if (AppConstants.epgUrl.startsWith('file://')) {
-      // Local testing override
-      final file = File(Uri.parse(AppConstants.epgUrl).toFilePath());
-      bodyString = await file.readAsString();
-    } else {
+    try {
+      debugPrint('EpgService: Fetching EPG from ${AppConstants.epgUrl}...');
       final response = await http.get(
         Uri.parse(AppConstants.epgUrl),
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-          'Accept-Encoding': 'gzip, deflate, br',
-        }
+          'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': 'application/xml, text/xml, */*',
+        },
       ).timeout(const Duration(seconds: 120));
 
+      debugPrint('EpgService: Response status code: ${response.statusCode}');
       if (response.statusCode != 200) {
         throw NetworkException(
           'Failed to fetch EPG data: ${response.statusCode}',
         );
       }
 
+      String bodyString;
       final bytes = response.bodyBytes;
+      debugPrint('EpgService: Received ${bytes.length} bytes');
 
-      // Check if the response bytes are gzipped (magic bytes: 0x1F, 0x8B)
       if (bytes.length >= 2 && bytes[0] == 0x1F && bytes[1] == 0x8B) {
-        final decompressed = gzip.decode(bytes);
-        bodyString = utf8.decode(decompressed, allowMalformed: true);
+        debugPrint('EpgService: Bytes have gzip magic header. Trying to decode...');
+        bodyString = await _decompressGzip(bytes);
       } else {
+        debugPrint('EpgService: Bytes do not have gzip magic header. Decoding as UTF8...');
         bodyString = utf8.decode(bytes, allowMalformed: true);
       }
-    }
+      
+      debugPrint('EpgService: XML string length: ${bodyString.length}');
 
-    // Parse on a background isolate to avoid janking the UI thread
-    return Isolate.run(() => _parseSchedule(bodyString));
+      debugPrint('EpgService: First 100 chars: ${bodyString.substring(0, bodyString.length < 100 ? bodyString.length : 100)}');
+
+      debugPrint('EpgService: Using compute to parse XML in background isolate...');
+      final schedule = await compute(_parseSchedule, bodyString);
+
+      debugPrint(
+          'EpgService: Successfully parsed schedule for ${schedule.keys.length} channels.');
+      return schedule;
+    } catch (e, stack) {
+      debugPrint('EpgService: Error during EPG fetch/parse: $e\n$stack');
+      debugPrint('EpgService: Continuing with empty schedule.');
+      return {};
+    }
+  }
+
+  /// Decompresses gzip bytes. Uses dart:io on native platforms.
+  Future<String> _decompressGzip(List<int> bytes) async {
+    try {
+      final decodedBytes = gzip.decode(bytes);
+      return utf8.decode(decodedBytes, allowMalformed: true);
+    } catch (e) {
+      debugPrint('EpgService: Failed to decompress gzip: $e');
+      return utf8.decode(bytes, allowMalformed: true);
+    }
   }
 }
 
@@ -57,7 +79,7 @@ class EpgService {
 /// Keeps a 24-hour forward window (now → +24h) so we can power both
 /// "Now Playing" and "Up Next" features.
 ///
-/// Must be a top-level function (not a closure) so it can be sent to an isolate.
+/// Must be a top-level function so it can be sent to compute().
 Map<String, List<EpgProgramme>> _parseSchedule(String xmlString) {
   final document = XmlDocument.parse(xmlString);
 
@@ -90,7 +112,7 @@ Map<String, List<EpgProgramme>> _parseSchedule(String xmlString) {
     schedule.putIfAbsent(channelId, () => []).add(programme);
   }
 
-  // Sort each channel's programmes chronologically so getNext() is a simple lookup
+  // Sort each channel's programmes chronologically
   for (final list in schedule.values) {
     list.sort((a, b) => a.start.compareTo(b.start));
   }

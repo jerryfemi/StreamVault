@@ -10,6 +10,11 @@ class CacheManager {
     await Hive.openBox<String>('favorites_cache');
   }
 
+  Future<void> clearCache() async {
+    final box = Hive.box<Channel>(_boxName);
+    await box.clear();
+  }
+
   Future<List<Channel>?> getChannels() async {
     final box = Hive.box<Channel>(_boxName);
     if (box.isEmpty) return null;
@@ -18,7 +23,7 @@ class CacheManager {
 
   Future<void> saveChannels(List<Channel> channels) async {
     final box = Hive.box<Channel>(_boxName);
-    await box.clear(); // Clear old cache
+    await box.clear();
     await box.addAll(channels);
   }
 }
