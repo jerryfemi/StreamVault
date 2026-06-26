@@ -8,8 +8,13 @@ class AppConstants {
   static const String moviesM3uUrl =
       'https://iptv-org.github.io/iptv/categories/movies.m3u';
 
+  // ── Remote Config (Admin Sync) ──
+  static const String remoteConfigUrl =
+      'https://jerryfemi.github.io/StreamVault-epg/config.json';
+
   // ── EPG ──
-  static const String epgUrl = 'https://jerryfemi.github.io/StreamVault-epg/guide.xml.gz';
+  static const String epgUrl =
+      'https://jerryfemi.github.io/StreamVault-epg/guide.xml.gz';
 
   // ── Cache TTLs ──
   static const Duration channelCacheTtl = Duration(hours: 6);
