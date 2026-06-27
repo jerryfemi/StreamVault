@@ -17,8 +17,11 @@ class GithubConfigService {
   /// Returns [RemoteConfig.empty] on any failure.
   Future<RemoteConfig> fetchConfig() async {
     try {
+      final uri = Uri.parse(AppConstants.remoteConfigUrl).replace(
+        queryParameters: {'t': DateTime.now().millisecondsSinceEpoch.toString()},
+      );
       final response = await _client
-          .get(Uri.parse(AppConstants.remoteConfigUrl))
+          .get(uri)
           .timeout(AppConstants.defaultTimeout);
 
       if (response.statusCode == 200) {

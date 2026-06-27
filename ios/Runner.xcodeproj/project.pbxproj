@@ -8,13 +8,29 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		21D042229CFCC6E9025DB83C /* neon_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C9604BF0BB83D782AFAB988D /* neon_icon@3x.png */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		4F0C475E9BF2721D5C0DB90D /* cyberpunk_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BA24BD4BAEAA9D8094BC7AA /* cyberpunk_icon@2x.png */; };
+		5CE2496A90B5592B5819C280 /* basic_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B54396A8BE48FD517A85AD /* basic_icon@3x.png */; };
+		62EC4327A6CDA60F0E60C1D5 /* light_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F5D4FC6A7BBCAF7FD582A23 /* light_icon@3x.png */; };
+		659047208D5A0A8CD9F5B4A6 /* cyberpunk_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = E6214A95BE5329727A4F52AF /* cyberpunk_icon@3x.png */; };
+		65D747988C09C94379EE2456 /* light_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 883C41C1B60EA6893FFDF073 /* light_icon@2x.png */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
+		7BA147D6BE09AE0E6ED6CBB5 /* basic_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C3B54396A8BE48FD517A85AD /* basic_icon@3x.png */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		9ADF414299A0A2E65918AB3E /* basic_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 23914F2192D335F9B82B5E9A /* basic_icon@2x.png */; };
+		A19143A9A7B43ECB543168E3 /* neon_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C7FD459D828769D266502267 /* neon_icon@2x.png */; };
+		B6444312AB89D14CF3712459 /* basic_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 23914F2192D335F9B82B5E9A /* basic_icon@2x.png */; };
+		D6674E6E9935B6A28B423D57 /* cyberpunk_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3BA24BD4BAEAA9D8094BC7AA /* cyberpunk_icon@2x.png */; };
+		E57447BFAC342BF59886A5AA /* neon_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C9604BF0BB83D782AFAB988D /* neon_icon@3x.png */; };
+		E7064D2481A3DA82DC0390C7 /* cyberpunk_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = E6214A95BE5329727A4F52AF /* cyberpunk_icon@3x.png */; };
+		EFCC42069CE255EFDA9A7ACB /* light_icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5F5D4FC6A7BBCAF7FD582A23 /* light_icon@3x.png */; };
+		F05B4B4E9F94DA2C58ED0B4A /* neon_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C7FD459D828769D266502267 /* neon_icon@2x.png */; };
+		F43447D0B47FE83B4363823D /* light_icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 883C41C1B60EA6893FFDF073 /* light_icon@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,13 +59,17 @@
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		23914F2192D335F9B82B5E9A /* basic_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "basic_icon@2x.png"; path = "Runner\\basic_icon@2x.png"; sourceTree = SOURCE_ROOT; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		3BA24BD4BAEAA9D8094BC7AA /* cyberpunk_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "cyberpunk_icon@2x.png"; path = "Runner\\cyberpunk_icon@2x.png"; sourceTree = SOURCE_ROOT; };
+		5F5D4FC6A7BBCAF7FD582A23 /* light_icon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "light_icon@3x.png"; path = "Runner\\light_icon@3x.png"; sourceTree = SOURCE_ROOT; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		883C41C1B60EA6893FFDF073 /* light_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "light_icon@2x.png"; path = "Runner\\light_icon@2x.png"; sourceTree = SOURCE_ROOT; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -57,6 +77,10 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C3B54396A8BE48FD517A85AD /* basic_icon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "basic_icon@3x.png"; path = "Runner\\basic_icon@3x.png"; sourceTree = SOURCE_ROOT; };
+		C7FD459D828769D266502267 /* neon_icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "neon_icon@2x.png"; path = "Runner\\neon_icon@2x.png"; sourceTree = SOURCE_ROOT; };
+		C9604BF0BB83D782AFAB988D /* neon_icon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "neon_icon@3x.png"; path = "Runner\\neon_icon@3x.png"; sourceTree = SOURCE_ROOT; };
+		E6214A95BE5329727A4F52AF /* cyberpunk_icon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "cyberpunk_icon@3x.png"; path = "Runner\\cyberpunk_icon@3x.png"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +120,14 @@
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				23914F2192D335F9B82B5E9A /* basic_icon@2x.png */,
+				C3B54396A8BE48FD517A85AD /* basic_icon@3x.png */,
+				C7FD459D828769D266502267 /* neon_icon@2x.png */,
+				C9604BF0BB83D782AFAB988D /* neon_icon@3x.png */,
+				3BA24BD4BAEAA9D8094BC7AA /* cyberpunk_icon@2x.png */,
+				E6214A95BE5329727A4F52AF /* cyberpunk_icon@3x.png */,
+				883C41C1B60EA6893FFDF073 /* light_icon@2x.png */,
+				5F5D4FC6A7BBCAF7FD582A23 /* light_icon@3x.png */,
 			);
 			sourceTree = "<group>";
 		};
@@ -208,6 +240,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9ADF414299A0A2E65918AB3E /* basic_icon@2x.png in Resources */,
+				7BA147D6BE09AE0E6ED6CBB5 /* basic_icon@3x.png in Resources */,
+				F05B4B4E9F94DA2C58ED0B4A /* neon_icon@2x.png in Resources */,
+				E57447BFAC342BF59886A5AA /* neon_icon@3x.png in Resources */,
+				D6674E6E9935B6A28B423D57 /* cyberpunk_icon@2x.png in Resources */,
+				659047208D5A0A8CD9F5B4A6 /* cyberpunk_icon@3x.png in Resources */,
+				F43447D0B47FE83B4363823D /* light_icon@2x.png in Resources */,
+				EFCC42069CE255EFDA9A7ACB /* light_icon@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -219,6 +259,14 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				B6444312AB89D14CF3712459 /* basic_icon@2x.png in Resources */,
+				5CE2496A90B5592B5819C280 /* basic_icon@3x.png in Resources */,
+				A19143A9A7B43ECB543168E3 /* neon_icon@2x.png in Resources */,
+				21D042229CFCC6E9025DB83C /* neon_icon@3x.png in Resources */,
+				4F0C475E9BF2721D5C0DB90D /* cyberpunk_icon@2x.png in Resources */,
+				E7064D2481A3DA82DC0390C7 /* cyberpunk_icon@3x.png in Resources */,
+				65D747988C09C94379EE2456 /* light_icon@2x.png in Resources */,
+				62EC4327A6CDA60F0E60C1D5 /* light_icon@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,6 +420,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)\\Runner";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.streamVault;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -387,6 +436,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)\\Runner";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.streamVault.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -404,6 +454,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)\\Runner";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.streamVault.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -419,6 +470,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)\\Runner";
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.streamVault.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -551,6 +603,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)\\Runner";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.streamVault;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -573,6 +626,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)\\Runner";
 				PRODUCT_BUNDLE_IDENTIFIER = com.example.streamVault;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
