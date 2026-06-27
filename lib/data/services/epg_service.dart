@@ -120,13 +120,19 @@ Map<String, List<EpgProgramme>> _parseSchedule(String xmlString) {
   return schedule;
 }
 
-/// Parses XMLTV timestamps like "20260619220000 +0000" into DateTime.
 DateTime _parseXmltvTime(String raw) {
-  final clean = raw.split(' ').first;
+  final parts = raw.split(' ');
+  final clean = parts.first;
   if (clean.length < 14) return DateTime.now();
 
-  return DateTime.parse(
-    '${clean.substring(0, 4)}-${clean.substring(4, 6)}-${clean.substring(6, 8)}'
-    'T${clean.substring(8, 10)}:${clean.substring(10, 12)}:${clean.substring(12, 14)}Z',
-  );
+  final timeStr = '${clean.substring(0, 4)}-${clean.substring(4, 6)}-${clean.substring(6, 8)}'
+      'T${clean.substring(8, 10)}:${clean.substring(10, 12)}:${clean.substring(12, 14)}';
+
+  if (parts.length > 1 && parts[1].length == 5) {
+    // Has timezone offset like +0000 or -0500
+    return DateTime.parse('$timeStr${parts[1]}').toLocal();
+  }
+  
+  // Default to UTC if no offset
+  return DateTime.parse('${timeStr}Z').toLocal();
 }

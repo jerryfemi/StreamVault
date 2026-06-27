@@ -10,11 +10,11 @@ class AppConstants {
 
   // ── Remote Config (Admin Sync) ──
   static const String remoteConfigUrl =
-      'https://jerryfemi.github.io/StreamVault-epg/config.json';
+      'https://raw.githubusercontent.com/jerryfemi/StreamVault-epg/main/config.json';
 
   // ── EPG ──
   static const String epgUrl =
-      'https://jerryfemi.github.io/StreamVault-epg/guide.xml.gz';
+      'https://raw.githubusercontent.com/jerryfemi/StreamVault-epg/main/guide.xml.gz';
 
   // ── Cache TTLs ──
   static const Duration channelCacheTtl = Duration(hours: 6);

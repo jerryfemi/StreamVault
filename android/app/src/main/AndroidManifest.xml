@@ -44,7 +44,7 @@
             android:name=".MainActivityNeon"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_neon"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -56,7 +56,7 @@
             android:name=".MainActivityCyberpunk"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_cyberpunk"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -68,7 +68,7 @@
             android:name=".MainActivityLight"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher_light"
+            android:icon="@mipmap/ic_launcher"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
