@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_ce_flutter/hive_ce_flutter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_dynamic_icon_plus/flutter_dynamic_icon_plus.dart';
 import '../../core/theme/app_theme.dart';
+import '../widgets/pin_entry_sheet.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -16,11 +20,95 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _isCalculating = true;
   bool _isClearing = false;
   int _cacheSizeBytes = 0;
+  String _currentIcon = 'default';
 
   @override
   void initState() {
     super.initState();
     _calculateCacheSize();
+    _loadCurrentIcon();
+  }
+
+  Future<void> _loadCurrentIcon() async {
+    try {
+      if (await FlutterDynamicIconPlus.supportsAlternateIcons) {
+        final alternateIconName = await FlutterDynamicIconPlus.alternateIconName;
+        if (mounted) {
+          setState(() {
+            _currentIcon = alternateIconName ?? 'default';
+          });
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _changeIcon(String iconId, {String? androidAlias, String? iosIcon}) async {
+    try {
+      if (await FlutterDynamicIconPlus.supportsAlternateIcons) {
+        final iconName = Platform.isAndroid ? androidAlias : iosIcon;
+        await FlutterDynamicIconPlus.setAlternateIconName(iconName: iconName);
+        if (mounted) {
+          setState(() {
+            _currentIcon = iconId;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('App icon updated successfully!')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update app icon: $e'),
+            backgroundColor: AppColors.accent,
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildIconOption(String title, String assetPath, String iconId, {String? androidAlias, String? iosIcon}) {
+    // For Android, when we query the current icon it might return the full alias name
+    // or just what we set. We'll simplify matching.
+    bool isSelected = false;
+    if (Platform.isAndroid && androidAlias != null) {
+      isSelected = _currentIcon == androidAlias || _currentIcon.endsWith(androidAlias);
+    } else if (Platform.isIOS && iosIcon != null) {
+      isSelected = _currentIcon == iosIcon;
+    } else if (iconId == 'default' && (_currentIcon == 'default' || _currentIcon == 'MainActivityDefault')) {
+      isSelected = true;
+    }
+
+    return GestureDetector(
+      onTap: () => _changeIcon(iconId, androidAlias: androidAlias, iosIcon: iosIcon),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected ? AppColors.accent : Colors.transparent,
+                width: 2,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.asset(assetPath, width: 50, height: 50, fit: BoxFit.cover),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: TextStyle(
+              color: isSelected ? AppColors.accent : AppColors.textSecondary,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _calculateCacheSize() async {
@@ -215,6 +303,62 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
+
+          // ── Appearance Section ──
+          const SizedBox(height: 24),
+          const Text('Appearance', style: AppTextStyles.subtitle),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppRadii.card),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.app_shortcut, color: AppColors.textPrimary),
+                  title: const Text('App Icon', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+                  subtitle: const Text('Choose your favorite style', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildIconOption('Basic', 'assets/basic.png', 'default', androidAlias: '.MainActivityDefault', iosIcon: null),
+                      _buildIconOption('Neon', 'assets/icon.png', 'neon', androidAlias: '.MainActivityNeon', iosIcon: 'neon_icon'),
+                      _buildIconOption('Cyberpunk', 'assets/cyberpunk.png', 'cyberpunk', androidAlias: '.MainActivityCyberpunk', iosIcon: 'cyberpunk_icon'),
+                      _buildIconOption('Light', 'assets/light.png', 'light', androidAlias: '.MainActivityLight', iosIcon: 'light_icon'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Version footer (long-press to access admin) ──
+          const SizedBox(height: 48),
+          Center(
+            child: GestureDetector(
+              onLongPress: () {
+                HapticFeedback.mediumImpact();
+                PinEntrySheet.show(
+                  context,
+                  correctPin: '1997',
+                  onSuccess: () => context.push('/admin'),
+                );
+              },
+              child: Text(
+                'StreamVault v1.0.0',
+                style: AppTextStyles.caption.copyWith(
+                  color: AppColors.textTertiary.withValues(alpha: 0.5),
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );

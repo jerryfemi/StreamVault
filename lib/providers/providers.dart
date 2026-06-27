@@ -3,13 +3,17 @@ import 'package:http/http.dart' as http;
 import '../core/constants/app_constants.dart';
 import '../data/models/channel.dart';
 import '../data/models/epg_programme.dart';
+import '../data/models/remote_config.dart';
 import '../data/models/stream_status.dart';
 import '../data/repositories/cache_manager.dart';
 import '../data/repositories/channel_repository.dart';
 import '../data/repositories/epg_repository.dart';
 import '../data/services/epg_service.dart';
+import '../data/services/github_config_service.dart';
 import '../data/services/m3u_service.dart';
 import '../data/services/registry_service.dart';
+import 'admin_settings_notifier.dart';
+import 'dead_channels_notifier.dart';
 import 'favorites_notifier.dart';
 import 'stream_status_notifier.dart';
 
@@ -116,15 +120,44 @@ final upNextProvider = Provider.family<EpgProgramme?, String>((ref, channelId) {
 });
 
 /// Stream validation status map — updates progressively as cards become visible.
+/// When a stream is confirmed dead, the [DeadChannelsNotifier] is notified
+/// so the ID is persisted locally for admin review.
 final streamStatusProvider =
     StateNotifierProvider<StreamStatusNotifier, Map<String, StreamStatus>>(
-      (ref) => StreamStatusNotifier(),
+      (ref) => StreamStatusNotifier(
+        onDead: (channelId) {
+          ref.read(localDeadChannelsProvider.notifier).markDead(channelId);
+        },
+      ),
     );
 
 /// Favorites provider for managing favorite channels.
 final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<String>>(
   (ref) => FavoritesNotifier(),
 );
+
+/// Locally-detected dead channels — persisted to Hive for admin review.
+final localDeadChannelsProvider =
+    StateNotifierProvider<DeadChannelsNotifier, Set<String>>(
+  (ref) => DeadChannelsNotifier(),
+);
+
+/// Admin settings (GitHub PAT, repo owner/name) — persisted to Hive.
+final adminSettingsProvider =
+    StateNotifierProvider<AdminSettingsNotifier, Map<String, String>>(
+  (ref) => AdminSettingsNotifier(),
+);
+
+/// GitHub config service for fetching / pushing config.json.
+final githubConfigServiceProvider = Provider<GithubConfigService>(
+  (ref) => GithubConfigService(client: ref.watch(httpClientProvider)),
+);
+
+/// Remote config fetched from GitHub Pages on startup.
+final remoteConfigProvider = FutureProvider<RemoteConfig>((ref) async {
+  final service = ref.watch(githubConfigServiceProvider);
+  return service.fetchConfig();
+});
 
 // ═══════════════════════════════════════════════════════════════════
 // UI-FACING PROVIDERS (derived, cheap)
@@ -137,25 +170,40 @@ final activeCategoryProvider = StateProvider<String>((ref) => 'All');
 final searchQueryProvider = StateProvider<String>((ref) => '');
 
 /// Filtered channel list — recomputes when category or search changes.
+///
+/// Channels in the remote config's dead list are excluded.
+/// Sorting priority: remote top channels > local favorites > alphabetical.
 final filteredChannelsProvider = Provider<AsyncValue<List<Channel>>>((ref) {
   final channels = ref.watch(allChannelsProvider);
   final category = ref.watch(activeCategoryProvider);
   final query = ref.watch(searchQueryProvider);
   final favorites = ref.watch(favoritesProvider);
+  final remoteConfig =
+      ref.watch(remoteConfigProvider).valueOrNull ?? RemoteConfig.empty;
 
   return channels.whenData((list) {
     final filtered = list.where((c) {
+      // Exclude channels flagged as dead by the remote config
+      if (remoteConfig.deadChannels.contains(c.id)) return false;
+
       final matchesCategory = category == 'All' || c.category == category;
       final matchesSearch =
           query.isEmpty || c.name.toLowerCase().contains(query.toLowerCase());
       return matchesCategory && matchesSearch;
     }).toList();
 
+    // Sort: remote top > local favorites > alphabetical
     filtered.sort((a, b) {
+      final aTop = remoteConfig.topChannels.contains(a.id);
+      final bTop = remoteConfig.topChannels.contains(b.id);
+      if (aTop && !bTop) return -1;
+      if (!aTop && bTop) return 1;
+
       final aFav = favorites.contains(a.id);
       final bFav = favorites.contains(b.id);
       if (aFav && !bFav) return -1;
       if (!aFav && bFav) return 1;
+
       return a.name.compareTo(b.name);
     });
 

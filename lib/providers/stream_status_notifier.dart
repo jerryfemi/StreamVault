@@ -6,8 +6,13 @@ import '../../data/models/stream_status.dart';
 ///
 /// Each channel is validated at most once per session. Validation is triggered
 /// lazily by VisibilityDetector when a channel card scrolls into the viewport.
+///
+/// An optional [onDead] callback is invoked when a channel is confirmed dead,
+/// allowing the provider layer to persist the ID to the local dead-channels store.
 class StreamStatusNotifier extends StateNotifier<Map<String, StreamStatus>> {
-  StreamStatusNotifier() : super({});
+  final void Function(String channelId)? onDead;
+
+  StreamStatusNotifier({this.onDead}) : super({});
 
   /// Validates a channel's stream if it hasn't been checked this session.
   ///
@@ -28,5 +33,10 @@ class StreamStatusNotifier extends StateNotifier<Map<String, StreamStatus>> {
 
     // Update with the result
     state = {...state, channelId: result};
+
+    // Notify the persistent dead-channels store
+    if (result == StreamStatus.dead) {
+      onDead?.call(channelId);
+    }
   }
 }

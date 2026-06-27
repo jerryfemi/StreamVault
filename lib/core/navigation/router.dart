@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stream_vault/ui/shell/app_shell.dart';
+import 'package:stream_vault/ui/pages/admin_page.dart';
 import 'package:stream_vault/ui/pages/browse_page.dart';
 import 'package:stream_vault/ui/pages/player_page.dart';
 import 'package:stream_vault/ui/pages/saved_page.dart';
@@ -60,6 +61,12 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      // Admin portal — overlays above the shell, not in the bottom nav
+      GoRoute(
+        path: '/admin',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AdminPage(),
       ),
     ],
   );

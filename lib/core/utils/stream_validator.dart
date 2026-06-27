@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import '../../core/constants/app_constants.dart';
 import '../../data/models/stream_status.dart';
 
 class StreamValidator {
@@ -15,7 +16,7 @@ class StreamValidator {
       final responseFuture = client.send(request);
 
       final response = await responseFuture.timeout(
-        const Duration(seconds: 10),
+        AppConstants.validationTimeout,
       );
 
       final contentType = response.headers['content-type']?.toLowerCase() ?? '';

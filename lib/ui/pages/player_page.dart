@@ -47,7 +47,10 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
     super.initState();
     _player = Player(
       configuration: const PlayerConfiguration(
-        bufferSize: 32 * 1024 * 1024, // 32MB limit for reduced bandwidth
+        bufferSize:
+            64 *
+            1024 *
+            1024, // Balanced 64MB buffer to prevent pauses without high memory/data usage
       ),
     );
     _controller = VideoController(_player);

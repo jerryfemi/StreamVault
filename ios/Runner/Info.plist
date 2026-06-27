@@ -24,6 +24,39 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundleAlternateIcons</key>
+		<dict>
+			<key>cyberpunk_icon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>cyberpunk_icon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>light_icon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>light_icon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>neon_icon</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>neon_icon</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>
