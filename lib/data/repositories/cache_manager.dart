@@ -8,6 +8,8 @@ class CacheManager {
     Hive.registerAdapter(ChannelAdapter());
     await Hive.openBox<Channel>(_boxName);
     await Hive.openBox<String>('favorites_cache');
+    await Hive.openBox<String>('local_dead_channels');
+    await Hive.openBox<String>('admin_settings');
   }
 
   Future<void> clearCache() async {
