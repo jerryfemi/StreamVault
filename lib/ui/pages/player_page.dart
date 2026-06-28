@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
+import 'package:stream_vault/ui/widgets/admin/custom_epg_dialog.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/providers.dart';
@@ -280,6 +281,27 @@ class _PlayerPageState extends ConsumerState<PlayerPage> {
               onSelectVideoTrack: (track) {
                 _player.setVideoTrack(track);
               },
+              onEditEpg:
+                  ref
+                          .watch(adminSettingsProvider)['github_token']
+                          ?.isNotEmpty ==
+                      true
+                  ? () {
+                      _player.pause();
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: AppColors.surface,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                        ),
+                        builder: (context) =>
+                            CustomEpgDialog(channelId: widget.channelId),
+                      );
+                    }
+                  : null,
             ),
 
           if (_hasError && _showControls)

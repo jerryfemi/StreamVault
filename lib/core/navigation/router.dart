@@ -8,6 +8,7 @@ import 'package:stream_vault/ui/pages/browse_page.dart';
 import 'package:stream_vault/ui/pages/player_page.dart';
 import 'package:stream_vault/ui/pages/saved_page.dart';
 import 'package:stream_vault/ui/pages/settings_page.dart';
+import 'package:stream_vault/ui/pages/live_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -23,7 +24,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, navigationShell) =>
             AppShell(shell: navigationShell),
         branches: [
-          // 0: Browse
+          // 0: Live
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/live',
+                builder: (context, state) => const LivePage(),
+              ),
+            ],
+          ),
+          // 1: Browse
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -42,7 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // 1: Saved
+          // 2: Saved
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -51,7 +61,7 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          // 2: Settings
+          // 3: Settings
           StatefulShellBranch(
             routes: [
               GoRoute(

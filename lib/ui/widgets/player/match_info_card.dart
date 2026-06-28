@@ -79,9 +79,12 @@ class MatchInfoCard extends StatelessWidget {
                         icon: Icons.flag_outlined,
                         iconColor: AppColors.textSecondary,
                         onTap: () {
+                          ref
+                              .read(localDeadChannelsProvider.notifier)
+                              .markDead(channel.id);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Reported stream issues.'),
+                              content: Text('Channel reported as dead.'),
                             ),
                           );
                         },

@@ -16,6 +16,7 @@ class PlayerControlsOverlay extends StatelessWidget {
   final VideoTrack? selectedVideoTrack;
   final List<VideoTrack> videoTracks;
   final Function(VideoTrack)? onSelectVideoTrack;
+  final VoidCallback? onEditEpg;
 
   const PlayerControlsOverlay({
     super.key,
@@ -32,6 +33,7 @@ class PlayerControlsOverlay extends StatelessWidget {
     this.selectedVideoTrack,
     this.videoTracks = const [],
     this.onSelectVideoTrack,
+    this.onEditEpg,
   });
 
   String _formatDuration(Duration d) {
@@ -91,6 +93,25 @@ class PlayerControlsOverlay extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
+                    if (onEditEpg != null)
+                      GestureDetector(
+                        onTap: onEditEpg,
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.black45,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white24),
+                          ),
+                          child: const Icon(
+                            Icons.edit_calendar,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                      ),
                     if (videoTracks.length > 1)
                       PopupMenuButton<VideoTrack>(
                         initialValue: selectedVideoTrack,

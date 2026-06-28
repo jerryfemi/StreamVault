@@ -10,6 +10,7 @@ class CacheManager {
     await Hive.openBox<String>('favorites_cache');
     await Hive.openBox<String>('local_dead_channels');
     await Hive.openBox<String>('admin_settings');
+    await Hive.openBox<Map<dynamic, dynamic>>('admin_custom_epg');
   }
 
   Future<void> clearCache() async {

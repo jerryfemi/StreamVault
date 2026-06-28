@@ -66,9 +66,13 @@ class _AdminPageState extends ConsumerState<AdminPage>
     // Gather locally-detected dead channels
     final localDead = ref.read(localDeadChannelsProvider);
 
+    // Gather custom EPG data
+    final customEpg = ref.read(adminCustomEpgProvider);
+
     final config = RemoteConfig(
       topChannels: favorites,
       deadChannels: localDead,
+      customEpg: customEpg,
     );
 
     final service = ref.read(githubConfigServiceProvider);
