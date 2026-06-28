@@ -13,6 +13,9 @@ import '../data/services/github_config_service.dart';
 import '../data/services/m3u_service.dart';
 import '../data/services/registry_service.dart';
 import 'admin_settings_notifier.dart';
+
+export 'admin_settings_notifier.dart';
+export 'admin_custom_epg_notifier.dart';
 import 'dead_channels_notifier.dart';
 import 'favorites_notifier.dart';
 import 'stream_status_notifier.dart';
@@ -80,6 +83,26 @@ final nowPlayingProvider = Provider.family<EpgProgramme?, String>((
   ref,
   channelId,
 ) {
+  // Check for an active custom EPG entry first
+  final remoteConfig =
+      ref.watch(remoteConfigProvider).valueOrNull ?? RemoteConfig.empty;
+  final customEpg = remoteConfig.customEpg[channelId];
+  if (customEpg != null) {
+    final now = DateTime.now();
+    if (now.isAfter(customEpg.start) && now.isBefore(customEpg.end)) {
+      return EpgProgramme(
+        channelId: channelId,
+        title: customEpg.title,
+        start: customEpg.start,
+        end: customEpg.end,
+        description: customEpg.description.isNotEmpty
+            ? customEpg.description
+            : 'Live Broadcast',
+      );
+    }
+  }
+
+  // Fallback to standard XMLTV EPG
   final scheduleAsync = ref.watch(epgScheduleProvider);
   return scheduleAsync.whenOrNull(
     data: (schedule) {
@@ -139,14 +162,14 @@ final favoritesProvider = StateNotifierProvider<FavoritesNotifier, Set<String>>(
 /// Locally-detected dead channels — persisted to Hive for admin review.
 final localDeadChannelsProvider =
     StateNotifierProvider<DeadChannelsNotifier, Set<String>>(
-  (ref) => DeadChannelsNotifier(),
-);
+      (ref) => DeadChannelsNotifier(),
+    );
 
 /// Admin settings (GitHub PAT, repo owner/name) — persisted to Hive.
 final adminSettingsProvider =
     StateNotifierProvider<AdminSettingsNotifier, Map<String, String>>(
-  (ref) => AdminSettingsNotifier(),
-);
+      (ref) => AdminSettingsNotifier(),
+    );
 
 /// GitHub config service for fetching / pushing config.json.
 final githubConfigServiceProvider = Provider<GithubConfigService>(
