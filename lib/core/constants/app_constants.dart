@@ -14,7 +14,7 @@ class AppConstants {
 
   // ── EPG ──
   static const String epgUrl =
-      'https://raw.githubusercontent.com/jerryfemi/StreamVault-epg/main/guide.xml.gz';
+      'https://jerryfemi.github.io/StreamVault-epg/guide.xml.gz';
 
   // ── Cache TTLs ──
   static const Duration channelCacheTtl = Duration(hours: 6);

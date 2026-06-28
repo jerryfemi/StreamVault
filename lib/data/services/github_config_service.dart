@@ -17,19 +17,29 @@ class GithubConfigService {
   /// Returns [RemoteConfig.empty] on any failure.
   Future<RemoteConfig> fetchConfig() async {
     try {
-      final uri = Uri.parse(AppConstants.remoteConfigUrl).replace(
-        queryParameters: {'t': DateTime.now().millisecondsSinceEpoch.toString()},
-      );
+      final uri = Uri.parse(AppConstants.remoteConfigUrl);
+      debugPrint('[GithubConfigService] Fetching config from: $uri');
+      
       final response = await _client
           .get(uri)
           .timeout(AppConstants.defaultTimeout);
 
+      debugPrint('[GithubConfigService] Fetch response status: ${response.statusCode}');
+      debugPrint('[GithubConfigService] Fetch response length: ${response.body.length}');
+
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
-        return RemoteConfig.fromJson(json);
+        final config = RemoteConfig.fromJson(json);
+        debugPrint('[GithubConfigService] Successfully parsed config.');
+        debugPrint('[GithubConfigService] Dead channels count: ${config.deadChannels.length}');
+        debugPrint('[GithubConfigService] Top channels count: ${config.topChannels.length}');
+        return config;
+      } else {
+        debugPrint('[GithubConfigService] Failed to fetch config. HTTP ${response.statusCode}');
+        debugPrint('[GithubConfigService] Response body: ${response.body}');
       }
-    } catch (e) {
-      debugPrint('[GithubConfigService] fetch failed: $e');
+    } catch (e, stack) {
+      debugPrint('[GithubConfigService] fetch failed: $e\n$stack');
     }
     return RemoteConfig.empty;
   }

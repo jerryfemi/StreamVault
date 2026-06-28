@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -35,7 +36,9 @@ class ChannelCard extends ConsumerWidget {
       key: Key('channel_card_${channel.id}'),
       onVisibilityChanged: (info) {
         if (info.visibleFraction > 0.1) {
-          ref.read(streamStatusProvider.notifier).validateIfUnknown(
+          ref
+              .read(streamStatusProvider.notifier)
+              .validateIfUnknown(
                 channel.id,
                 channel.streamUrl,
                 channel.headers,
@@ -50,61 +53,61 @@ class ChannelCard extends ConsumerWidget {
           duration: const Duration(milliseconds: 250),
           child: Container(
             padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(AppRadii.card),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ── Top row: Logo, Name, Flag ──
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _ChannelLogo(channel: channel),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      channel.name,
-                      style: AppTextStyles.channelName.copyWith(fontSize: 14),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(AppRadii.card),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ── Top row: Logo, Name, Flag ──
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _ChannelLogo(channel: channel),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        channel.name,
+                        style: AppTextStyles.channelName.copyWith(fontSize: 14),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _StatusDot(status: status),
-                      const SizedBox(height: 4),
-                      if (CountryHelper.getCountryCode(channel.id) != null)
-                        Text(
-                          '${CountryHelper.getFlag(channel.id)} ${CountryHelper.getCountryCode(channel.id)!.toUpperCase() == 'UK' ? 'GB' : CountryHelper.getCountryCode(channel.id)!.toUpperCase()}',
-                          style: AppTextStyles.caption.copyWith(
-                            color: AppColors.textTertiary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        _StatusDot(status: status),
+                        const SizedBox(height: 4),
+                        if (CountryHelper.getCountryCode(channel.id) != null)
+                          Text(
+                            '${CountryHelper.getFlag(channel.id)} ${CountryHelper.getCountryCode(channel.id)!.toUpperCase() == 'UK' ? 'GB' : CountryHelper.getCountryCode(channel.id)!.toUpperCase()}',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.textTertiary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
 
-              // ── Bottom section: EPG or fallback ──
-              if (isDead)
-                _buildUnavailable()
-              else if (nowPlaying != null)
-                _buildEpgBlock(nowPlaying)
-              else
-                _buildNoEpg(),
-            ],
+                // ── Bottom section: EPG or fallback ──
+                if (isDead)
+                  _buildUnavailable()
+                else if (nowPlaying != null)
+                  _buildEpgBlock(nowPlaying)
+                else
+                  _buildNoEpg(),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -227,12 +230,13 @@ class _ChannelLogo extends StatelessWidget {
     if (channel.logo.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(AppRadii.logo),
-        child: Image.network(
-          channel.logo,
+        child: CachedNetworkImage(
+          imageUrl: channel.logo,
           width: 44,
           height: 44,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _fallbackLogo(abbrev, colors),
+          errorWidget: (_, _, _) => _fallbackLogo(abbrev, colors),
+          placeholder: (_, _) => _fallbackLogo(abbrev, colors),
         ),
       );
     }

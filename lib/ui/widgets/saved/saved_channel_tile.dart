@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -30,7 +31,9 @@ class SavedChannelTile extends ConsumerWidget {
       key: Key('saved_channel_tile_${channel.id}'),
       onVisibilityChanged: (info) {
         if (info.visibleFraction > 0.1) {
-          ref.read(streamStatusProvider.notifier).validateIfUnknown(
+          ref
+              .read(streamStatusProvider.notifier)
+              .validateIfUnknown(
                 channel.id,
                 channel.streamUrl,
                 channel.headers,
@@ -46,160 +49,160 @@ class SavedChannelTile extends ConsumerWidget {
             border: Border.all(color: AppColors.border),
             borderRadius: BorderRadius.circular(AppRadii.card),
           ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadii.card),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: isActuallyOffline
-                      ? const Color(0xFF444444)
-                      : AppColors.liveGreen,
-                  width: 3,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadii.card),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: isActuallyOffline
+                        ? const Color(0xFF444444)
+                        : AppColors.liveGreen,
+                    width: 3,
+                  ),
                 ),
               ),
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                // ── Logo ──
-                Opacity(
-                  opacity: isActuallyOffline ? 0.4 : 1.0,
-                  child: _buildLogo(),
-                ),
-                const SizedBox(width: 12),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  // ── Logo ──
+                  Opacity(
+                    opacity: isActuallyOffline ? 0.4 : 1.0,
+                    child: _buildLogo(),
+                  ),
+                  const SizedBox(width: 12),
 
-                // ── Info ──
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        channel.name,
-                        style: AppTextStyles.channelName.copyWith(
-                          fontSize: 15,
-                          color: isActuallyOffline
-                              ? AppColors.textSecondary
-                              : AppColors.textPrimary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      if (isActuallyOffline)
-                        const Text(
-                          'No active programme',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textTertiary,
-                            fontStyle: FontStyle.italic,
+                  // ── Info ──
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          channel.name,
+                          style: AppTextStyles.channelName.copyWith(
+                            fontSize: 15,
+                            color: isActuallyOffline
+                                ? AppColors.textSecondary
+                                : AppColors.textPrimary,
                           ),
-                        )
-                      else if (nowPlaying != null)
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 6),
+                        if (isActuallyOffline)
+                          const Text(
+                            'No active programme',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textTertiary,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          )
+                        else if (nowPlaying != null)
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.accent,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'LIVE',
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  nowPlaying.title,
+                                  style: AppTextStyles.epgTitle,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          const Text(
+                            'No programme info',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textTertiary,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        const SizedBox(height: 8),
                         Row(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                                vertical: 2,
+                            Text(
+                              CountryHelper.getFlag(channel.id),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              CountryHelper.getName(channel.id),
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.textTertiary,
                               ),
-                              decoration: BoxDecoration(
-                                color: AppColors.accent,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'LIVE',
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                            ),
+                            if (isActuallyOffline) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF333333),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'Ready',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                nowPlaying.title,
-                                style: AppTextStyles.epgTitle,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
+                            ],
                           ],
-                        )
-                      else
-                        const Text(
-                          'No programme info',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textTertiary,
-                            fontStyle: FontStyle.italic,
-                          ),
                         ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Text(
-                            CountryHelper.getFlag(channel.id),
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            CountryHelper.getName(channel.id),
-                            style: AppTextStyles.caption.copyWith(
-                              color: AppColors.textTertiary,
-                            ),
-                          ),
-                          if (isActuallyOffline) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF333333),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'Ready',
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                // ── Play Button ──
-                const SizedBox(width: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isActuallyOffline
-                        ? const Color(0xFF2A2A2A)
-                        : const Color(0x26E5383B),
-                    borderRadius: BorderRadius.circular(12),
+                  // ── Play Button ──
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isActuallyOffline
+                          ? const Color(0xFF2A2A2A)
+                          : const Color(0x26E5383B),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      color: isActuallyOffline
+                          ? AppColors.textTertiary
+                          : AppColors.accent,
+                      size: 24,
+                    ),
                   ),
-                  child: Icon(
-                    Icons.play_arrow_rounded,
-                    color: isActuallyOffline
-                        ? AppColors.textTertiary
-                        : AppColors.accent,
-                    size: 24,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -211,12 +214,13 @@ class SavedChannelTile extends ConsumerWidget {
     if (channel.logo.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: Image.network(
-          channel.logo,
+        child: CachedNetworkImage(
+          imageUrl: channel.logo,
           width: 56,
           height: 56,
           fit: BoxFit.cover,
-          errorBuilder: (_, _, _) => _fallbackLogo(abbrev, colors),
+          errorWidget: (_, _, _) => _fallbackLogo(abbrev, colors),
+          placeholder: (_, _) => _fallbackLogo(abbrev, colors),
         ),
       );
     }
